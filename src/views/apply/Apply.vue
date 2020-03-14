@@ -1,11 +1,11 @@
 <template>
-	<div>应用</div>
+  <div>应用</div>
 </template>
 
 <script>
-	export default{
-		naem:'Apply'
-	}
+export default {
+  name: "Apply"
+};
 </script>
 
 <style>

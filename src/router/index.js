@@ -2,10 +2,10 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 
-const Home = () => import('../views/home/Home');
-const Apply = () => import('../views/apply/Apply');
-const My = () => import('../views/my/My');
-const Shop = () => import('../views/shop/Shop');
+const Home = () => import('@/views/home/Home');
+const Apply = () => import('@/views/apply/Apply');
+const My = () => import('@/views/my/My');
+const Shop = () => import('@/views/shop/Shop');
 Vue.use(VueRouter);
 
 const routes = [

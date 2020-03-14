@@ -4,14 +4,13 @@ import axios from 'axios'
 export function Request(config) {
   const instance = axios.create({
     //创建一个axios一个实例对象
-    baseURL: 'http://rap2api.taobao.org',
-    timeout: 5000
+    baseURL: 'http://123.207.32.32:8000',
+    timeout: 50000
   });
 
   //设置请求拦截器
   instance.interceptors.request.use(res => {
     //请求成功之后的拦截 像请求发出去以后提示用户请求中可以在这设置!
-    console.log(res);
     return res; //拦截操作做完以后一定要记得返回数据，不然一直卡在这没有数据请求出去!
 
   }, err => {
@@ -29,3 +28,5 @@ export function Request(config) {
   //返回一个promise对象
   return instance(config)
 }
+
+
