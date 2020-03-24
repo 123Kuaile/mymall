@@ -1,6 +1,6 @@
 <template>
   <div class="product">
-    <product-item v-for="item in product" :itemData="item"></product-item>
+    <product-item v-for="item in product" :itemData="item" :key="item.title"></product-item>
   </div>
 </template>
 
@@ -27,5 +27,6 @@ export default {
 .product {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
 }
 </style>

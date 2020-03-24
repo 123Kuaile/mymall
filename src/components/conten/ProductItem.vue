@@ -1,9 +1,9 @@
 <template>
-  <div class="item">
-    <img :src="itemData.show.img" alt />
+  <div class="item" @click="productItemClick">
+    <img :src="showImg" alt @load="loadImg" />
     <p>{{itemData.title}}</p>
     <div class="pri-cf">
-      <span class="price">{{itemData.orgPrice}}</span>
+      <span class="price">{{showPrice}}</span>
       <span class="cfav">{{itemData.cfav}}</span>
     </div>
   </div>
@@ -19,6 +19,24 @@ export default {
         return {};
       }
     }
+  },
+  computed: {
+    showImg() {
+      return this.itemData.image || this.itemData.show.img;
+    },
+    showPrice() {
+      return this.itemData.orgPrice || "￥" + this.itemData.price;
+    }
+  },
+  methods: {
+    loadImg() {
+      //this.$store.commit("changeIsScroll"); //vuex版本处理
+      this.$bus.$emit("changeIsScroll");
+    },
+    productItemClick() {
+      this.$router.push("/detail/" + this.itemData.iid);
+      this.$bus.$emit("setIsShow");
+    }
   }
 };
 </script>
@@ -26,7 +44,6 @@ export default {
 <style>
 .item {
   width: 48%;
-  margin-right: 5px;
   font-size: 14px;
   margin-bottom: 5px;
   text-align: center;
@@ -38,7 +55,7 @@ export default {
 }
 .item img {
   width: 100%;
-  min-height: 270px;
+  min-height: 290px;
 }
 .price {
   float: left;
@@ -51,5 +68,9 @@ export default {
   width: 65%;
   display: inline-block;
   padding: 5px 0;
+}
+.pri-cf img {
+  height: 90%;
+  width: 15px;
 }
 </style>

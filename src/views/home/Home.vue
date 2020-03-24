@@ -3,63 +3,33 @@
     <navbar class="nav-bar">
       <div slot="centre">购物街</div>
     </navbar>
-    <swiper :banner="banner"></swiper>
-    <recom :recom="recommends"></recom>
-    <the-flag></the-flag>
-    <nav-control :conten="['流行','新款','热门']" class="nav-control"></nav-control>
-    <product :product="product.pop.list"></product>
-    <ul>
-      <li>内容1</li>
-      <li>内容2</li>
-      <li>内容3</li>
-      <li>内容4</li>
-      <li>内容5</li>
-      <li>内容6</li>
-      <li>内容7</li>
-      <li>内容8</li>
-      <li>内容9</li>
-      <li>内容10</li>
-      <li>内容11</li>
-      <li>内容12</li>
-      <li>内容13</li>
-      <li>内容14</li>
-      <li>内容15</li>
-      <li>内容16</li>
-      <li>内容17</li>
-      <li>内容18</li>
-      <li>内容19</li>
-      <li>内容20</li>
-      <li>内容21</li>
-      <li>内容22</li>
-      <li>内容23</li>
-      <li>内容24</li>
-      <li>内容25</li>
-      <li>内容26</li>
-      <li>内容27</li>
-      <li>内容28</li>
-      <li>内容29</li>
-      <li>内容30</li>
-      <li>内容31</li>
-      <li>内容32</li>
-      <li>内容33</li>
-      <li>内容34</li>
-      <li>内容35</li>
-      <li>内容36</li>
-      <li>内容37</li>
-      <li>内容38</li>
-      <li>内容39</li>
-      <li>内容40</li>
-      <li>内容41</li>
-      <li>内容42</li>
-      <li>内容43</li>
-      <li>内容44</li>
-      <li>内容45</li>
-      <li>内容46</li>
-      <li>内容47</li>
-      <li>内容48</li>
-      <li>内容49</li>
-      <li>内容50</li>
-    </ul>
+    <nav-control
+      :conten="['流行','新款','热门']"
+      @tableClick="tableClick"
+      :navControlShow="activeNavControl "
+      v-show="activeNavControl"
+      ref="navControl1"
+    ></nav-control>
+    <scroll
+      ref="warp"
+      class="warp"
+      :probe-type="3"
+      @scroll="backShow"
+      @pullingUp="pullingUp"
+      :pull-up-load="true"
+    >
+      <swiper :banner="banner" @loadImg.once="loadImg"></swiper>
+      <recom :recom="recommends"></recom>
+      <the-flag></the-flag>
+      <nav-control
+        v-show="!activeNavControl"
+        :conten="['流行','新款','热门']"
+        @tableClick="tableClick"
+        ref="NavControl"
+      ></nav-control>
+      <product :product="showCurrentType"></product>
+    </scroll>
+    <back-top @click.native="backClick" v-show="isShowBack"></back-top>
   </div>
 </template>
 
@@ -67,15 +37,18 @@
 //公共组件部分
 import navbar from "@/components/common/navbar/NavBar";
 import Swiper from "./childrenCom/chilSwiper";
+import Scroll from "@/components/common/scroll/Scroll";
 
 //本次项目相关组件
 import Recom from "./childrenCom/Recom";
 import TheFlag from "./childrenCom/TheFlag";
 import NavControl from "@/components/conten/NavControl";
 import Product from "@/components/conten/Product";
+import BackTop from "@/components/conten/backtop/BackTop";
 
 //导入的数据 方法
 import { getHomeSwiper, getHomeProduct } from "@/network/home";
+import { antiShake } from "@/components/common/stopShake/antiShake";
 
 export default {
   name: "Home",
@@ -85,7 +58,18 @@ export default {
     Recom,
     TheFlag,
     NavControl,
-    Product
+    Product,
+    Scroll,
+    BackTop
+  },
+  computed: {
+    showCurrentType() {
+      return this.product[this.currentTableControl].list;
+    }
+    /*  vuex版本解决better-scroll滑动卡顿需要的属性!
+    isImgRefrsh() {
+      return this.$store.state.isScrollHeight;
+    } */
   },
   data() {
     return {
@@ -104,12 +88,35 @@ export default {
           list: [],
           page: 0
         }
-      }
+      },
+      currentTableControl: "pop",
+      isShowBack: false,
+      offsetTopNavControl: 0,
+      activeNavControl: false,
+      savaY: 0
     };
   },
+  activated() {
+    this.$refs.warp.refresh();
+    this.$refs.warp.scrollTo(0, this.savaY, 0);
+  },
+  deactivated() {
+    this.savaY = this.$refs.warp.getScroolY();
+  },
+  mounted() {
+    //调用防抖函数
+    let doRefrsh = antiShake(this.$refs.warp.refresh, 200);
+    //监听事件总线里的方法
+    this.$bus.$on("changeIsScroll", () => {
+      //调用防抖函数，如果是向后台发送请求可以减轻服务器压力
+      doRefrsh();
+      //console.log(this.$refs.warp.scroll.scrollerHeight); 就是为了重新计算可拉动区域的高度就不会发生卡顿行为了
+    });
+  },
   created() {
+    //请求数据部分 --轮播图数据
     this.getHomeSwiperRequeset();
-
+    //请求数据部分 --商品列表
     this.getHomeProductRequest("pop");
     this.getHomeProductRequest("new");
     this.getHomeProductRequest("sell");
@@ -126,20 +133,68 @@ export default {
     getHomeProductRequest(type) {
       const page = this.product[type].page + 1;
       getHomeProduct(type, page).then(res => {
-        console.log(res.data.list);
         this.product[type].list.push(...res.data.list);
-        setTimeout(() => {
-          console.log(this.product[type].list);
-        }, 2000);
       });
+    },
+    //事件监听相关的方法
+    tableClick(index) {
+      //判断nav-control栏用户选择的是哪一项
+      let arr = ["pop", "new", "sell"];
+      switch (index) {
+        case 0:
+          this.currentTableControl = "pop";
+          break;
+        case 1:
+          this.currentTableControl = "new";
+          break;
+        case 2:
+          this.currentTableControl = "sell";
+          break;
+      }
+      this.$refs.navControl1.currentIndex = index;
+      this.$refs.NavControl.currentIndex = index;
+    },
+    backClick() {
+      this.$refs.warp.scrollTo(0, 0);
+    },
+    backShow(p) {
+      //返回顶部的按钮是否显示的判断
+      if (-p.y > 1000) {
+        this.isShowBack = true;
+      } else {
+        this.isShowBack = false;
+      }
+
+      //nav控制条的定位格式
+      if (-p.y > this.offsetTopNavControl) {
+        this.activeNavControl = true;
+      } else {
+        this.activeNavControl = false;
+      }
+    },
+    pullingUp() {
+      //上拉加载更多数据
+      this.getHomeProductRequest(this.currentTableControl);
+    },
+    loadImg() {
+      this.offsetTopNavControl = this.$refs.NavControl.$el.offsetTop;
     }
   }
+  /*  //监听 --vuex版本处理better-scroll滑动卡顿
+  watch: {
+    isImgRefrsh(newValue, oldValue) {
+      this.$refs.warp.refresh();
+      console.log(5);
+    }
+  } */
 };
 </script>
 
 <style scope>
 #home {
   padding-top: 44px;
+  height: 100vh;
+  position: relative;
 }
 .nav-bar {
   width: 100%;
@@ -149,10 +204,11 @@ export default {
   top: 0;
   z-index: 1;
 }
-.nav-control {
-  position: sticky;
+.warp {
+  position: absolute;
   top: 44px;
-  background: #fff;
-  padding: 10px 0;
+  bottom: 49px;
+  left: 0px;
+  right: 0px;
 }
 </style>

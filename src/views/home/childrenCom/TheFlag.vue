@@ -10,7 +10,7 @@
 export default {};
 </script>
 
-<style>
+<style scoped>
 .the-flag img {
   width: 100%;
 }

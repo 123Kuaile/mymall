@@ -35,8 +35,8 @@ export default {
   flex: 1;
 }
 .row img {
-  width: 65px;
-  height: 65px;
+  width: 75%;
+  height: 75%;
 }
 .row h2 {
   padding-top: 4px;

@@ -1,7 +1,10 @@
 <template>
   <div id="app">
-    <router-view></router-view>
-    <main-table></main-table>
+    <keep-alive exclude="detail">
+      <router-view></router-view>
+    </keep-alive>
+
+    <main-table v-if="isShow"></main-table>
   </div>
 </template>
 
@@ -14,8 +17,19 @@ export default {
   components: {
     MainTable
   },
+  data() {
+    return {
+      isShow: true
+    };
+  },
   created() {
-    Request({
+    this.$bus.$on("setIsShow", () => {
+      this.isShow = false;
+    });
+    this.$bus.$on("changeIsShow", () => {
+      this.isShow = true;
+    });
+    /*  Request({
       //这里面是config参数
       url: "/home/multidata",
       params: {
@@ -32,11 +46,11 @@ export default {
       .catch(err => {
         //数据请求错误回来以后的错误回调函数
         console.log(err);
-      });
+      }); */
   }
 };
 </script>
 
-<style scope>
+<style scoped>
 @import url("assets/css/base.css");
 </style>

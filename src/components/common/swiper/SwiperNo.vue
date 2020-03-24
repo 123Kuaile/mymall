@@ -52,13 +52,14 @@ export default {
       scrolling: false // 是否正在滚动
     };
   },
-  mounted: function() {
+  mounted() {
     // 1.操作DOM, 在前后添加Slide
-    setTimeout(() => {
+    this.$nextTick(() => {
       this.initEls();
-      // 2.开启定时器
       this.starTime();
-    }, 2000);
+    });
+
+    // 2.开启定时器
   },
   methods: {
     //初始化元素列表
@@ -66,6 +67,7 @@ export default {
       let SwpEl = document.querySelector(".swiper");
       let SldEls = SwpEl.children;
       //把获取到的元素个数赋值给变量
+      console.log(SldEls);
       this.slideCount = SldEls.length;
       if (this.slideCount > 1) {
         //只有图片个数大于1时才要生成前后的图片形成无缝滚动
@@ -91,15 +93,7 @@ export default {
     },
     //开启定时器
     starTime() {
-      this.playTime = window.setInterval(() => {
-        this.nextPict();
-      }, 2000);
-    },
-    //下一张
-    nextPict() {
-      this.currentIndex++;
-      this.swiperStyle.transition = "transform" + this.animDuration + "ms";
-      this.setTransform(-this.currentIndex * this.totalWidth);
+      this.playTime = window.setInterval(() => {}, 2000);
     }
   }
 };

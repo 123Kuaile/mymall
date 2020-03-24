@@ -1,9 +1,7 @@
 <template>
-  <swiper>
-    <swiper-item v-for="item in banner" :key="item.title">
-      <a :href="item.link">
-        <img :src="item.image" @load="loadImg" alt />
-      </a>
+  <swiper class="detail-swiper">
+    <swiper-item v-for="(item,index) in banner" :key="index">
+      <img :src="item" alt />
     </swiper-item>
   </swiper>
 </template>
@@ -12,7 +10,7 @@
 import { Swiper, SwiperItem } from "@/components/common/swiper/index";
 
 export default {
-  name: "ChilSwiper",
+  name: "childrenSwiper",
   props: {
     banner: {
       type: Array,
@@ -24,14 +22,13 @@ export default {
   components: {
     Swiper,
     SwiperItem
-  },
-  methods: {
-    loadImg() {
-      this.$emit("loadImg");
-    }
   }
 };
 </script>
 
-<style>
+<style scoped>
+.detail-swiper {
+  height: 400px;
+  overflow: hidden;
+}
 </style>
