@@ -1,6 +1,6 @@
 <template>
   <div class="big-pict">
-    <img v-for="(item,index) in imgSrc" :key="index" :src="item" @load="pictLoad" />
+    <img v-for="(item,index) in imgSrc" :key="index" :src="'http:' +item" @load="pictLoad" />
   </div>
 </template>
 

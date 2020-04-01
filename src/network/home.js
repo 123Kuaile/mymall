@@ -7,7 +7,7 @@ export function getHomeSwiper() {
 }
 export function getHomeProduct(type, page) {
   return Request({
-    url: "/api/wh/home/data",
+    url: "/home/data",
     params: {
       type,
       page

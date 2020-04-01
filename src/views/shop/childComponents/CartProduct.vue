@@ -3,7 +3,7 @@
     <div class="item-bar" v-for="(item,index) in info" :key="index" :class="{mask:item.mask}">
       <check-btn class="i-left" :isActive="item.checked" @click.native="checkClick(item)"></check-btn>
       <div class="i-centre">
-        <img :src="item.image" alt />
+        <img :src="'http:' + item.image" alt />
       </div>
       <div class="i-title">
         <div class="tit">{{item.title}}</div>

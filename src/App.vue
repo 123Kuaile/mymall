@@ -4,7 +4,7 @@
       <router-view></router-view>
     </keep-alive>
 
-    <main-table v-if="isShow"></main-table>
+    <main-table></main-table>
   </div>
 </template>
 
@@ -23,9 +23,6 @@ export default {
     };
   },
   created() {
-    this.$bus.$on("setIsShow", () => {
-      this.isShow = false;
-    });
     this.$bus.$on("changeIsShow", () => {
       this.isShow = true;
     });
