@@ -16,11 +16,16 @@ export default {};
 </script>
 <style scoped>
 .nav-bar {
-  height: 44px;
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
   box-shadow: 0 1px 2px rgba(100, 100, 100, 0.1);
   text-align: center;
   line-height: 44px;
+  background-color: #fe8096;
 }
 .left,
 .right {

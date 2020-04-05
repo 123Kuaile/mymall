@@ -41,7 +41,7 @@ export default {
 
 <style scoped>
 .nav-bar {
-  background: pink;
+  background-color: #fe8096;
   color: #fff;
 }
 .scroll {
